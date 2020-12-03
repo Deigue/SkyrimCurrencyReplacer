@@ -19,6 +19,10 @@ namespace SkyrimCurrencyReplacer
         private static readonly ModKey CoinsOfTamrielModKey =
             ModKey.FromNameAndExtension("Coins of Tamriel V2 SSE Edition.esp");
 
+        private static readonly FormKey Gold = Skyrim.MiscItem.Gold001;
+        private static readonly FormKey Aether = CoinsOfTamrielV2.MiscItem.Gold002;
+        private static readonly FormKey Ayleid = CoinsOfTamrielV2.MiscItem.Gold003;
+        
         public static int Main(string[] args)
         {
             return SynthesisPipeline.Instance.Patch<ISkyrimMod, ISkyrimModGetter>(
@@ -68,7 +72,7 @@ namespace SkyrimCurrencyReplacer
             var coinsOfTamrielMod = coinsOfTamrielContainer.modListing.Mod;
             var nativeContainers = coinsOfTamrielMod.Containers;
 
-            // 2.a. Find winning containers we are allowed to change and apply our algorithm to.
+            // 2.a. Find Winning Containers we are allowed to change and apply our algorithm to.
             IEnumerable<ModContext<ISkyrimMod, IContainer, IContainerGetter>> containersToPatch = state.LoadOrder
                 .PriorityOrder
                 .Container()
@@ -140,15 +144,12 @@ namespace SkyrimCurrencyReplacer
 
             #endregion
 
+            // 3. Patched Leveled List items based on predicate dynamically.
 
-            //state.LoadOrder.PriorityOrder.Container()
-            //coinsOfTamrielMod.Containers.
-
-            // Patch REFRs with randomized generated variations of coins/currencies across worldspaces and cells.
-
-            // Handle leveled lists containing LVLI.
-
-            // Handle flora actionable containers like pouches to emit currencies.
+            // 4. Patch REFRs with randomized generated variations of coins/currencies across worldspaces and cells.
+            
+            
+            // P.S: Activator, Flora, NAVI, Quest are either used in the above or are unrelated and don't need patching.
         }
     }
 }
