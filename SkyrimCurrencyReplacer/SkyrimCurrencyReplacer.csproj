@@ -6,6 +6,7 @@
 
     <ItemGroup>
         <PackageReference Include="Mutagen.Bethesda" Version="0.21.8" />
+        <PackageReference Include="Mutagen.Bethesda.FormKeys.SkyrimSE" Version="1.0.0" />
         <PackageReference Include="Mutagen.Bethesda.Synthesis" Version="0.11.3" />
         <PackageReference Include="GitInfo" Version="*">
             <PrivateAssets>all</PrivateAssets>
@@ -14,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="CoinsOfTamrielV2" />
+      <Folder Include="COTV2" />
     </ItemGroup>
 
 </Project>

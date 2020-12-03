@@ -1,6 +1,6 @@
 using Mutagen.Bethesda;
 
-namespace SkyrimCurrencyReplacer.CoinsOfTamrielV2
+namespace SkyrimCurrencyReplacer.COTV2
 {
     public static partial class CoinsOfTamrielV2
     {
