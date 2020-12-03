@@ -1,4 +1,6 @@
-namespace Mutagen.Bethesda.FormKeys.SkyrimSE
+using Mutagen.Bethesda;
+
+namespace SkyrimCurrencyReplacer.CoinsOfTamrielV2
 {
     public static partial class CoinsOfTamrielV2
     {

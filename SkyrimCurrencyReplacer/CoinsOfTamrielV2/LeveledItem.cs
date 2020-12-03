@@ -1,10 +1,12 @@
-namespace Mutagen.Bethesda.FormKeys.SkyrimSE
+using Mutagen.Bethesda;
+
+namespace SkyrimCurrencyReplacer.CoinsOfTamrielV2
 {
     public static partial class CoinsOfTamrielV2
     {
         public static class LeveledItem
         {
-            private readonly static ModKey ModKey = ModKey.FromNameAndExtension("Coins of Tamriel V2 SSE Edition.esp");
+            private static readonly ModKey ModKey = ModKey.FromNameAndExtension("Coins of Tamriel V2 SSE Edition.esp");
             public static FormKey LootImperialLuckNordic => ModKey.MakeFormKey(0x55e5);
             public static FormKey LootPerkGoldenTouchChangeNordic => ModKey.MakeFormKey(0x55e4);
             public static FormKey LootGoldChangeNordic => ModKey.MakeFormKey(0x55e3);

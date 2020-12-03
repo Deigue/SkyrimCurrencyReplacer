@@ -48,7 +48,7 @@ namespace SkyrimCurrencyReplacer
                 return;
             }
             
-            
+            SynthesisLog("Good to proceed");
             
 
             // Patch up Containers originating from CoT V2 Replacer.

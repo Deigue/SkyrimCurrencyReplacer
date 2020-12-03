@@ -1,10 +1,12 @@
-namespace Mutagen.Bethesda.FormKeys.SkyrimSE
+using Mutagen.Bethesda;
+
+namespace SkyrimCurrencyReplacer.CoinsOfTamrielV2
 {
     public static partial class CoinsOfTamrielV2
     {
         public static class Flora
         {
-            private readonly static ModKey ModKey = ModKey.FromNameAndExtension("Coins of Tamriel V2 SSE Edition.esp");
+            private static readonly ModKey ModKey = ModKey.FromNameAndExtension("Coins of Tamriel V2 SSE Edition.esp");
             public static FormKey CoinPurseLargeNordic => ModKey.MakeFormKey(0x275d5);
             public static FormKey CoinPurseSmallDwemer => ModKey.MakeFormKey(0x275d6);
             public static FormKey CoinPurseMediumDwemer => ModKey.MakeFormKey(0x275d7);
