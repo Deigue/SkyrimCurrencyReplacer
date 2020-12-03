@@ -82,11 +82,21 @@ namespace SkyrimCurrencyReplacer
                     // Detection Triggers ... 
                     return context.Record.Items?.Any(container =>
                         container.Item.Item.FormKey.IsOneOf(
+                            LootGoldChange,
+                            LootPerkGoldenTouch,
                             LootPerkGoldenTouchChange,
-                            LootImperialLuck
-                        )) ?? false;
+                            LootImperialLuck,
+                            LootFalmerGoldBoss,
+                            Gold)) ?? false;
                 });
 
+            // TESTING SECTION //
+            containersToPatch.Do(ctx => 
+                SynthesisLog($"Container {ctx.Record.EditorID} - {ctx.Record.Name} from {ctx.ModKey.FileName} eligible."));
+            return;
+            // TESTING SECTION //
+            
+            
             // 2.b. Patch up Native containers originating within Coins of Tamriel plugin that are left over.
             // NOTE: Will only patch against the most recent override, i.e. The load order provided must be already
             // conflict resolved for everything UPTO BUT NOT INCLUSIVE OF Coins of Tamriel V2 itself.
