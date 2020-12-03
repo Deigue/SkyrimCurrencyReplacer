@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using DynamicData;
 using Mutagen.Bethesda;
@@ -7,7 +8,9 @@ using Mutagen.Bethesda.Synthesis;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 using SkyrimCurrencyReplacer.COTV2;
+using SkyrimCurrencyReplacer.Extensions;
 using Wabbajack.Common;
+using static Mutagen.Bethesda.FormKeys.SkyrimSE.Skyrim.LeveledItem;
 
 namespace SkyrimCurrencyReplacer
 {
@@ -51,25 +54,48 @@ namespace SkyrimCurrencyReplacer
 
         private static void RunPatch(SynthesisState<ISkyrimMod, ISkyrimModGetter> state)
         {
-            // Detect presence of Coins of Tamriel V2 Replacer plugin.
+            // 0. Initialize method contextual variables.
+            var cache = state.LinkCache;
+            
+            // 1. Detect presence of Coins of Tamriel V2 Replacer plugin.
             if (!state.LoadOrder.TryGetValue(CoinsOfTamrielModKey,
                     out (int index, IModListing<ISkyrimModGetter> modListing) coinsOfTamrielContainer) ||
                 coinsOfTamrielContainer.modListing.Mod is null)
                 throw new MissingModException(CoinsOfTamrielModKey,
                     $"Mod {CoinsOfTamrielModKey.Name} was not found in Load Order.");
 
-            // Patch up Native containers originating within Coins of Tamriel plugin.
-            // NOTE: Will only patch against the most recent override, i.e. The load order provided must be already
-            // conflict resolved for everything except Coins of Tamriel V2 itself.
+            // 2. Patching ALL Containers for Currency Related information dynamically.
             var coinsOfTamrielMod = coinsOfTamrielContainer.modListing.Mod;
             var nativeContainers = coinsOfTamrielMod.Containers;
 
+            // 2.a. Find winning containers we are allowed to change and apply our algorithm to.
+            IEnumerable<ModContext<ISkyrimMod, IContainer, IContainerGetter>> containersToPatch = state.LoadOrder
+                .PriorityOrder
+                .Container()
+                .WinningContextOverrides(cache)
+                .Where(context =>
+                {
+                    // Detection Triggers ... 
+                    return context.Record.Items?.Any(container =>
+                        container.Item.Item.FormKey.IsOneOf(
+                            LootPerkGoldenTouchChange,
+                            LootImperialLuck
+                        )) ?? false;
+                });
+
+            // 2.b. Patch up Native containers originating within Coins of Tamriel plugin that are left over.
+            // NOTE: Will only patch against the most recent override, i.e. The load order provided must be already
+            // conflict resolved for everything UPTO BUT NOT INCLUSIVE OF Coins of Tamriel V2 itself.
+
+            #region Test 1
+
+            // Test 1 : Overriding containers proof of concept works as expected.
             var counter = 0;
             foreach (var container in nativeContainers)
             {
                 //state.LoadOrder.ListedOrder.Take(coinsOfTamrielContainer.index)
-                  //  .Do(x => Console.WriteLine(x.ModKey));
-                
+                //  .Do(x => Console.WriteLine(x.ModKey));
+
                 var containerContext = state.LoadOrder.ListedOrder.Take(coinsOfTamrielContainer.index)
                     .Reverse()
                     .Container()
@@ -78,12 +104,12 @@ namespace SkyrimCurrencyReplacer
 
                 if (containerContext is null) continue;
                 var closestWinningContainer = containerContext.Record;
-                
+
                 SynthesisLog($"{containerContext.ModKey} for {containerContext.Record.Name}");
                 //var cond2 = !Equals(closestWinningContainer, container);
                 //var cond3 = !closestWinningContainer?.FormKey.ModKey.IsSkyrimBaseMod();
                 //SynthesisLog($"{cond1} {cond2} {cond3}");
-                
+
                 if (!Equals(closestWinningContainer, container) &&
                     !containerContext.ModKey.IsSkyrimBaseMod())
                 {
@@ -91,7 +117,7 @@ namespace SkyrimCurrencyReplacer
                     var adjustedContainer = state.PatchMod.Containers.GetOrAddAsOverride(closestWinningContainer);
                     //var goldenTouchChange = state.LinkCache.Lookup<ILeveledItemGetter>(Skyrim.LeveledItem.LootPerkGoldenTouchChange);
                     var itemsToReplace = adjustedContainer.Items?.FindAll(i =>
-                        i.Item.Item.FormKey == Skyrim.LeveledItem.LootPerkGoldenTouchChange);
+                        i.Item.Item.FormKey == LootPerkGoldenTouchChange);
                     ContainerEntry goldenTouchChangeNordic = new ContainerEntry
                     {
                         Item = new ContainerItem()
@@ -108,9 +134,12 @@ namespace SkyrimCurrencyReplacer
                     counter++;
                 }
             }
-            
+
+
             SynthesisLog($"Performed {counter} replacements in Containers", true);
-            return; //exit fast.
+
+            #endregion
+
 
             //state.LoadOrder.PriorityOrder.Container()
             //coinsOfTamrielMod.Containers.
