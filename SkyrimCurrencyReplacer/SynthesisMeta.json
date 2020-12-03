@@ -1,7 +1,7 @@
 {
   "Nickname": "SkyrimCurrencyReplacer",
   "Visibility": "Exclude",
-  "OneLineDescription": "",
-  "LongDescription": "",
+  "OneLineDescription": "Automatic Currency replacements across Skyrim",
+  "LongDescription": "Work in progress.",
   "PreferredAutoVersioning": "Default"
 }
