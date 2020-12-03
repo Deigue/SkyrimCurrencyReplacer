@@ -8,7 +8,8 @@ namespace SkyrimCurrencyReplacer
 {
     public static class CurrencyReplacer
     {
-        private const string CoinsOfTamriel = "Coins of Tamriel V2 SSE Edition.esp";
+        private static readonly ModKey CoinsOfTamrielModKey =
+            ModKey.FromNameAndExtension("Coins of Tamriel V2 SSE Edition.esp");
 
         public static int Main(string[] args)
         {
@@ -25,7 +26,7 @@ namespace SkyrimCurrencyReplacer
                     }
                 });
         }
-        
+
         private static void SynthesisLog(string message, bool special = false)
         {
             if (special)
@@ -33,6 +34,7 @@ namespace SkyrimCurrencyReplacer
                 Console.WriteLine();
                 Console.Write(">>> ");
             }
+
             Console.WriteLine(message);
             if (special) Console.WriteLine();
         }
@@ -40,18 +42,25 @@ namespace SkyrimCurrencyReplacer
         private static void RunPatch(SynthesisState<ISkyrimMod, ISkyrimModGetter> state)
         {
             // Detect presence of Replacer plugin.
-            var coinsOfTamrielMod = state.LoadOrder.FirstOrDefault(x => x.Key.FileName is CoinsOfTamriel).Value.Mod;
+            if (!state.LoadOrder.TryGetValue(CoinsOfTamrielModKey,
+                    out IModListing<ISkyrimModGetter>? coinsOfTamrielModListing) ||
+                coinsOfTamrielModListing.Mod is null)
+                throw new MissingModException(CoinsOfTamrielModKey,
+                    $"Mod {CoinsOfTamrielModKey.Name} was not found in Load Order.");
 
-            if (coinsOfTamrielMod is null)
+           
+            // Patch up Native containers originating within Coins of Tamriel plugin.
+            // NOTE: Will only patch against the most recent override, i.e. The load order provided must be already
+            // conflict resolved for everything except Coins of Tamriel V2 itself.
+            var coinsOfTamrielMod = coinsOfTamrielModListing.Mod;
+            foreach (var container in coinsOfTamrielMod.Containers)
             {
-                SynthesisLog($"Could not find {CoinsOfTamriel} in load order.");
-                return;
+                // do replacements and override here.
             }
-            
-            SynthesisLog("Good to proceed");
-            
 
-            // Patch up Containers originating from CoT V2 Replacer.
+
+            //state.LoadOrder.PriorityOrder.Container()
+            //coinsOfTamrielMod.Containers.
 
             // Patch REFRs with randomized generated variations of coins/currencies across worldspaces and cells.
 
