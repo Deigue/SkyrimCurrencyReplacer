@@ -1,2 +1,8 @@
 ﻿{
+  "matchCriteria": {
+    "editorId": {
+      "nordic":[],
+      "dwarven":[]
+    }
+  }
 }

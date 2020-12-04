@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using DynamicData;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.FormKeys.SkyrimSE;
 using Mutagen.Bethesda.Synthesis;
 using Mutagen.Bethesda.Skyrim;
+using Newtonsoft.Json;
 using Noggog;
 using SkyrimCurrencyReplacer.COTV2;
 using SkyrimCurrencyReplacer.Extensions;
@@ -22,7 +24,7 @@ namespace SkyrimCurrencyReplacer
         private static readonly FormKey Gold = Skyrim.MiscItem.Gold001;
         private static readonly FormKey Aether = CoinsOfTamrielV2.MiscItem.Gold002;
         private static readonly FormKey Ayleid = CoinsOfTamrielV2.MiscItem.Gold003;
-        
+
         public static int Main(string[] args)
         {
             return SynthesisPipeline.Instance.Patch<ISkyrimMod, ISkyrimModGetter>(
@@ -58,9 +60,30 @@ namespace SkyrimCurrencyReplacer
 
         private static void RunPatch(SynthesisState<ISkyrimMod, ISkyrimModGetter> state)
         {
-            // 0. Initialize method contextual variables.
-            var cache = state.LinkCache;
-            
+            // 0. Initialize method contextual variables and configurations.
+            ILinkCache cache = state.LinkCache;
+            string configFilePath = Path.Combine(state.ExtraSettingsDataPath, "currency-replacer-config.json");
+            string errorMessage = "";
+
+            if (!File.Exists(configFilePath))
+            {
+                errorMessage = "Cannot find currency-replacer-config.json for Currency Replacer Rules.";
+                SynthesisLog(errorMessage);
+                throw new FileNotFoundException(errorMessage, configFilePath);
+            }
+
+            CurrencyConfig config;
+            try
+            {
+                config = JsonConvert.DeserializeObject<CurrencyConfig>(File.ReadAllText(configFilePath));
+            }
+            catch (JsonSerializationException jsonException)
+            {
+                errorMessage = "Failed to parse currency-replacer-config.json, please review expected format.";
+                SynthesisLog(errorMessage);
+                throw new JsonSerializationException(errorMessage, jsonException);
+            }
+
             // 1. Detect presence of Coins of Tamriel V2 Replacer plugin.
             if (!state.LoadOrder.TryGetValue(CoinsOfTamrielModKey,
                     out (int index, IModListing<ISkyrimModGetter> modListing) coinsOfTamrielContainer) ||
@@ -72,7 +95,7 @@ namespace SkyrimCurrencyReplacer
             var coinsOfTamrielMod = coinsOfTamrielContainer.modListing.Mod;
             var nativeContainers = coinsOfTamrielMod.Containers;
 
-            // 2.a. Find Winning Containers we are allowed to change and apply our algorithm to.
+            // 2.a. Find Winning Containers we are allowed to clone, change and apply our algorithm to.
             IEnumerable<ModContext<ISkyrimMod, IContainer, IContainerGetter>> containersToPatch = state.LoadOrder
                 .PriorityOrder
                 .Container()
@@ -80,23 +103,25 @@ namespace SkyrimCurrencyReplacer
                 .Where(context =>
                 {
                     // Detection Triggers ... 
-                    return context.Record.Items?.Any(container =>
+                    return !nativeContainers.Contains(context.Record) &&
+                        (context.Record.Items?.Any(container =>
                         container.Item.Item.FormKey.IsOneOf(
                             LootGoldChange,
                             LootPerkGoldenTouch,
                             LootPerkGoldenTouchChange,
                             LootImperialLuck,
                             LootFalmerGoldBoss,
-                            Gold)) ?? false;
+                            Gold)) ?? false);
                 });
 
             // TESTING SECTION //
-            containersToPatch.Do(ctx => 
-                SynthesisLog($"Container {ctx.Record.EditorID} - {ctx.Record.Name} from {ctx.ModKey.FileName} eligible."));
+            containersToPatch.Do(ctx =>
+                SynthesisLog(
+                    $"Container {ctx.Record.EditorID} - {ctx.Record.Name} from {ctx.ModKey.FileName} eligible."));
             return;
             // TESTING SECTION //
-            
-            
+
+
             // 2.b. Patch up Native containers originating within Coins of Tamriel plugin that are left over.
             // NOTE: Will only patch against the most recent override, i.e. The load order provided must be already
             // conflict resolved for everything UPTO BUT NOT INCLUSIVE OF Coins of Tamriel V2 itself.
@@ -157,8 +182,8 @@ namespace SkyrimCurrencyReplacer
             // 3. Patched Leveled List items based on predicate dynamically.
 
             // 4. Patch REFRs with randomized generated variations of coins/currencies across worldspaces and cells.
-            
-            
+
+
             // P.S: Activator, Flora, NAVI, Quest are either used in the above or are unrelated and don't need patching.
         }
     }
