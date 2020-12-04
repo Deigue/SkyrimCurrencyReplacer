@@ -1,8 +1,24 @@
 ﻿{
   "matchCriteria": {
     "editorId": {
-      "nordic":[],
-      "dwarven":[]
+      "nordic": {
+        "contains": [],
+        "exact": []
+      },
+      "dwemer": {
+        "contains": [],
+        "exact": []
+      }
+    },
+    "name": {
+      "nordic": {
+        "contains": [],
+        "exact": []
+      },
+      "dwemer": {
+        "contains": [],
+        "exact": []
+      }
     }
   }
 }
