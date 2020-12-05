@@ -83,7 +83,7 @@ namespace SkyrimCurrencyReplacer
                 SynthesisLog(errorMessage);
                 throw new JsonSerializationException(errorMessage, jsonException);
             }
-
+            
             // 1. Detect presence of Coins of Tamriel V2 Replacer plugin.
             if (!state.LoadOrder.TryGetValue(CoinsOfTamrielModKey,
                     out (int index, IModListing<ISkyrimModGetter> modListing) coinsOfTamrielContainer) ||
@@ -117,7 +117,7 @@ namespace SkyrimCurrencyReplacer
             // TESTING SECTION //
             containersToPatch.Do(ctx =>
                 SynthesisLog(
-                    $"Container {ctx.Record.EditorID} - {ctx.Record.Name} from {ctx.ModKey.FileName} eligible."));
+                    $"Container {ctx.Record.FormKey}: {ctx.Record.EditorID} - {ctx.Record.Name} from {ctx.ModKey.FileName} eligible."));
             return;
             // TESTING SECTION //
 

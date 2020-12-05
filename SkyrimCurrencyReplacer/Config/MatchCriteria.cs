@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SkyrimCurrencyReplacer.Converters;
 
 namespace SkyrimCurrencyReplacer.Config
 {
@@ -12,8 +13,16 @@ namespace SkyrimCurrencyReplacer.Config
             FormKey = formKey;
         }
 
-        [JsonProperty("editorId")] public IMatchField EditorId { get; }
-        [JsonProperty("name")] public IMatchField Name { get; }
-        [JsonProperty("formId")] public IMatchField FormKey { get; }
+        [JsonProperty("editorId")]
+        [JsonConverter(typeof(MatchStringConverter))]
+        public IMatchField EditorId { get; }
+
+        [JsonProperty("name")]
+        [JsonConverter(typeof(MatchStringConverter))]
+        public IMatchField Name { get; }
+
+        [JsonProperty("formId")]
+        [JsonConverter(typeof(MatchFormKeyConverter))]
+        public IMatchField FormKey { get; }
     }
 }

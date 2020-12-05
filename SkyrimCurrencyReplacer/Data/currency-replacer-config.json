@@ -3,35 +3,38 @@
     "editorId": {
       "normal": {
         "contains": [],
-        "exact": []
+        "equals": []
       },
       "nordic": {
         "contains": [],
-        "exact": []
+        "equals": []
       },
       "dwemer": {
         "contains": [],
-        "exact": []
+        "equals": []
       }
     },
     "name": {
       "normal": {
         "contains": [],
-        "exact": []
+        "equals": []
       },
       "nordic": {
         "contains": [],
-        "exact": []
+        "equals": [
+          "Urn",
+          "Burial Urn"
+        ]
       },
       "dwemer": {
         "contains": [],
-        "exact": []
+        "equals": []
       }
     },
-    "formId":{
-      "normal":[],
-      "nordic":[],
-      "dwemer":[]
+    "formId": {
+      "normal": [],
+      "nordic": [],
+      "dwemer": []
     }
   }
 }
