@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
 using SkyrimCurrencyReplacer.Config;
 
 namespace SkyrimCurrencyReplacer
@@ -10,15 +11,17 @@ namespace SkyrimCurrencyReplacer
         {
             MatchCriteria = matchCriteria;
         }
-        
+
         // TODO: Match criterion priority order
         // Exact Name > Exact EDID > Contains in EDID
-        
+
         // [JsonConstructor]
         // private CurrencyConfig()
         // {
         // }
-        
-        [JsonProperty("matchCriteria")] public MatchCriteria MatchCriteria { get; }
+
+        [JsonProperty("matchCriteria")]
+        [NotNull]
+        public MatchCriteria MatchCriteria { get; }
     }
 }

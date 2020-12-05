@@ -9,6 +9,7 @@ using Mutagen.Bethesda.Synthesis;
 using Mutagen.Bethesda.Skyrim;
 using Newtonsoft.Json;
 using Noggog;
+using SkyrimCurrencyReplacer.Config;
 using SkyrimCurrencyReplacer.COTV2;
 using SkyrimCurrencyReplacer.Extensions;
 using Wabbajack.Common;
@@ -111,7 +112,8 @@ namespace SkyrimCurrencyReplacer
                             LootPerkGoldenTouchChange,
                             LootImperialLuck,
                             LootFalmerGoldBoss,
-                            Gold)) ?? false);
+                            Gold)) ?? false) &&
+                        context.Record.Matches(IMatchField.MatchType.Nordic, config);
                 });
             
             // TESTING SECTION //

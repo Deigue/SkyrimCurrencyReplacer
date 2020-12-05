@@ -18,12 +18,12 @@ namespace SkyrimCurrencyReplacer.Config
         [JsonProperty("nordic")] public HashSet<FormKey> Nordic { get; }
         [JsonProperty("dwemer")] public HashSet<FormKey> Dwemer { get; }
 
-        public IMatchField.MatchType GetMatchType()
+        public IMatchField.MatchType GetMatchType(string? query)
         {
             throw new System.NotImplementedException();
         }
 
-        public bool Matches(IMatchField.MatchType matchType)
+        public bool Matches(IMatchField.MatchType matchType, string? query)
         {
             throw new System.NotImplementedException();
         }

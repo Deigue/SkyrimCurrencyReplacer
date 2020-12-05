@@ -24,16 +24,18 @@
         }
 
         /// <summary>
-        /// Attempts to match the Major Record with one of the Match Types.
+        /// Returns the closest corresponding MatchType for the given <paramref name="query"/>
         /// </summary>
-        /// <returns>Returns the Match Type closest representing the base major record.</returns>
-        MatchType GetMatchType();
+        /// <param name="query">String to be matched to a particular MatchType</param>
+        /// <returns>Returns the Match Type</returns>
+        MatchType GetMatchType(string? query);
 
         /// <summary>
-        /// Indicates if the Major Record patches the provided <paramref name="matchType"/>
+        /// Whether the <paramref name="query" string matches the provided <paramref name="matchType"/>/>
         /// </summary>
         /// <param name="matchType">Match Type to check against</param>
-        /// <returns>Returns true if the Major Record seems to match the provided <paramref name="matchType"/></returns>
-        bool Matches(MatchType matchType);
+        /// <param name="query">String that need to be queried</param>
+        /// <returns>Returns true if the query matches the <paramref name="matchType"/> provided.></returns>
+        bool Matches(MatchType matchType, string? query);
     }
 }
