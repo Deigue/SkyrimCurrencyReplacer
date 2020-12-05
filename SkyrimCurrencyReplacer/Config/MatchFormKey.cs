@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Mutagen.Bethesda;
 using Newtonsoft.Json;
+using SkyrimCurrencyReplacer.Enums;
 
 namespace SkyrimCurrencyReplacer.Config
 {
@@ -19,12 +20,12 @@ namespace SkyrimCurrencyReplacer.Config
         [JsonProperty("nordic")] public HashSet<FormKey> Nordic { get; }
         [JsonProperty("dwemer")] public HashSet<FormKey> Dwemer { get; }
 
-        public IMatchField.MatchType GetMatchType(string? query)
+        public MatchType GetMatchType(string? query)
         {
             throw new System.NotImplementedException();
         }
 
-        public bool Matches(IMatchField.MatchType matchType, string? query)
+        public bool Matches(MatchType matchType, string? query)
         {
             throw new System.NotImplementedException();
         }

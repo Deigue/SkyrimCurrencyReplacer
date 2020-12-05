@@ -14,6 +14,7 @@ using SkyrimCurrencyReplacer.COTV2;
 using SkyrimCurrencyReplacer.Extensions;
 using Wabbajack.Common;
 using static Mutagen.Bethesda.FormKeys.SkyrimSE.Skyrim.LeveledItem;
+using MatchType = SkyrimCurrencyReplacer.Enums.MatchType;
 
 namespace SkyrimCurrencyReplacer
 {
@@ -117,7 +118,7 @@ namespace SkyrimCurrencyReplacer
                             LootImperialLuck,
                             LootFalmerGoldBoss,
                             Gold)) ?? false) &&
-                        context.Record.Matches(IMatchField.MatchType.Nordic, config);
+                        context.Record.Matches(MatchType.Nordic, config);
                 });
             
             // TESTING SECTION //

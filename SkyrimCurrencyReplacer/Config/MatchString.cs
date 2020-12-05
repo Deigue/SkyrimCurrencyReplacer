@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using SkyrimCurrencyReplacer.Enums;
 
 namespace SkyrimCurrencyReplacer.Config
 {
@@ -19,27 +20,27 @@ namespace SkyrimCurrencyReplacer.Config
         [JsonProperty("dwemer")] public MatcherDb Dwemer { get; }
 
 
-        public IMatchField.MatchType GetMatchType(string? query)
+        public MatchType GetMatchType(string? query)
         {
             // TODO: Full implementation.
             
             // Just doing exact equal matches for now ...
-            if (query is null) return IMatchField.MatchType.Normal;
-            if (Normal.EqualSet.Contains(query)) return IMatchField.MatchType.Normal;
-            if (Nordic.EqualSet.Contains(query)) return IMatchField.MatchType.Nordic;
-            return Dwemer.EqualSet.Contains(query) ? IMatchField.MatchType.Dwemer : IMatchField.MatchType.Normal;
+            if (query is null) return MatchType.Normal;
+            if (Normal.EqualSet.Contains(query)) return MatchType.Normal;
+            if (Nordic.EqualSet.Contains(query)) return MatchType.Nordic;
+            return Dwemer.EqualSet.Contains(query) ? MatchType.Dwemer : MatchType.Normal;
         }
 
-        public bool Matches(IMatchField.MatchType matchType, string? query)
+        public bool Matches(MatchType matchType, string? query)
         {
             // TODO: Full implementation to take care of all situations.
             
             // Implemented simple exact match so far.
             return matchType switch
             {
-                IMatchField.MatchType.Normal => GetMatchType(query) == IMatchField.MatchType.Normal,
-                IMatchField.MatchType.Dwemer => GetMatchType(query) == IMatchField.MatchType.Dwemer,
-                IMatchField.MatchType.Nordic => GetMatchType(query) == IMatchField.MatchType.Nordic,
+                MatchType.Normal => GetMatchType(query) == MatchType.Normal,
+                MatchType.Dwemer => GetMatchType(query) == MatchType.Dwemer,
+                MatchType.Nordic => GetMatchType(query) == MatchType.Nordic,
                 _ => false
             };
         }
