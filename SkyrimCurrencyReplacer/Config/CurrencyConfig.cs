@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
-using SkyrimCurrencyReplacer.Config;
 
-namespace SkyrimCurrencyReplacer
+namespace SkyrimCurrencyReplacer.Config
 {
     public class CurrencyConfig
     {
