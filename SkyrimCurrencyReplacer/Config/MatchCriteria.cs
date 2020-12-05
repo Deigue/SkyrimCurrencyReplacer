@@ -3,6 +3,7 @@ using SkyrimCurrencyReplacer.Converters;
 
 namespace SkyrimCurrencyReplacer.Config
 {
+    [JsonObject(ItemRequired = Required.Always)]
     public class MatchCriteria
     {
         [JsonConstructor]

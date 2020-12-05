@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 
 namespace SkyrimCurrencyReplacer.Config
 {
+    [JsonObject(ItemRequired = Required.Always)]
     public class MatchFormKey : IMatchField
     {
         [JsonConstructor]

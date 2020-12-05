@@ -1,8 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 
 namespace SkyrimCurrencyReplacer.Config
 {
+    [JsonObject(ItemRequired = Required.Always)]
     public class CurrencyConfig
     {
         [JsonConstructor]

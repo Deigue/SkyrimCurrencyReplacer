@@ -47,7 +47,6 @@ namespace SkyrimCurrencyReplacer
             if (special)
             {
                 Console.WriteLine();
-                Console.Write(">>> ");
             }
 
             Console.WriteLine(message);
@@ -73,25 +72,20 @@ namespace SkyrimCurrencyReplacer
                 throw new FileNotFoundException(errorMessage, configFilePath);
             }
             
-            // TESTING
-            SynthesisLog("Configuration File:", true);
+            SynthesisLog("**********************************", true);
+            SynthesisLog("Currency Configuration File Used:");
             SynthesisLog(File.ReadAllText(configFilePath));
             SynthesisLog("**********************************");
-            // TESTING //
             
             CurrencyConfig config;
             try
             {
                 config = JsonConvert.DeserializeObject<CurrencyConfig>(File.ReadAllText(configFilePath));
-                // config = JsonConvert.DeserializeObject<CurrencyConfig>(File.ReadAllText(configFilePath), new JsonSerializerSettings()
-                // {
-                //     NullValueHandling = NullValueHandling.Ignore
-                // }) ?? throw new JsonException("problem happened");
             }
             catch (JsonSerializationException jsonException)
             {
                 errorMessage = "Failed to parse currency-replacer-config.json, please review expected format.";
-                SynthesisLog(errorMessage);
+                SynthesisLog(errorMessage, true);
                 throw new JsonSerializationException(errorMessage, jsonException);
             }
             
