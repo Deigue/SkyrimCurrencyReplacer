@@ -1,6 +1,10 @@
 ﻿{
   "matchCriteria": {
     "editorId": {
+      "normal": {
+        "contains": [],
+        "exact": []
+      },
       "nordic": {
         "contains": [],
         "exact": []
@@ -11,6 +15,10 @@
       }
     },
     "name": {
+      "normal": {
+        "contains": [],
+        "exact": []
+      },
       "nordic": {
         "contains": [],
         "exact": []
@@ -19,6 +27,11 @@
         "contains": [],
         "exact": []
       }
+    },
+    "formId":{
+      "normal":[],
+      "nordic":[],
+      "dwemer":[]
     }
   }
 }

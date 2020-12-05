@@ -113,7 +113,7 @@ namespace SkyrimCurrencyReplacer
                             LootFalmerGoldBoss,
                             Gold)) ?? false);
                 });
-
+            
             // TESTING SECTION //
             containersToPatch.Do(ctx =>
                 SynthesisLog(
