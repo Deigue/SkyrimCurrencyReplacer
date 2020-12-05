@@ -12,11 +12,11 @@ namespace SkyrimCurrencyReplacer.Config
         MatchType GetMatchType(string? query);
 
         /// <summary>
-        /// Whether the <paramref name="query" string matches the provided <paramref name="matchType"/>/>
+        /// Whether the <paramref name="query"/> string matches the provided <paramref name="matchType"/>/>
         /// </summary>
         /// <param name="matchType">Match Type to check against</param>
         /// <param name="query">String that need to be queried</param>
-        /// <returns>Returns true if the query matches the <paramref name="matchType"/> provided.></returns>
+        /// <returns>Returns true if match is successful.></returns>
         bool Matches(MatchType matchType, string? query);
     }
 }
