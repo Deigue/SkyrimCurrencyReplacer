@@ -10,37 +10,25 @@ using Mutagen.Bethesda.Skyrim;
 using Newtonsoft.Json;
 using Noggog;
 using SkyrimCurrencyReplacer.Config;
-using SkyrimCurrencyReplacer.COTV2;
 using SkyrimCurrencyReplacer.Extensions;
-using Wabbajack.Common;
 using static Mutagen.Bethesda.FormKeys.SkyrimSE.Skyrim.LeveledItem;
 using MatchType = SkyrimCurrencyReplacer.Enums.MatchType;
+using System.Threading.Tasks;
 
 namespace SkyrimCurrencyReplacer
 {
     public static class CurrencyReplacer
     {
-        private static readonly ModKey CoinsOfTamrielModKey =
-            ModKey.FromNameAndExtension("Coins of Tamriel V2 SSE Edition.esp");
+        private static readonly IFormLinkGetter<IMiscItemGetter> Gold = Skyrim.MiscItem.Gold001;
+        private static readonly IFormLinkGetter<IMiscItemGetter> Aether = CoinsOfTamrielV2.MiscItem.Gold002;
+        private static readonly IFormLinkGetter<IMiscItemGetter> Ayleid = CoinsOfTamrielV2.MiscItem.Gold003;
 
-        private static readonly FormKey Gold = Skyrim.MiscItem.Gold001;
-        private static readonly FormKey Aether = CoinsOfTamrielV2.MiscItem.Gold002;
-        private static readonly FormKey Ayleid = CoinsOfTamrielV2.MiscItem.Gold003;
-
-        public static int Main(string[] args)
+        public static Task<int> Main(string[] args)
         {
-            return SynthesisPipeline.Instance.Patch<ISkyrimMod, ISkyrimModGetter>(
-                args: args,
-                patcher: RunPatch,
-                userPreferences: new UserPreferences()
-                {
-                    ActionsForEmptyArgs = new RunDefaultPatcher()
-                    {
-                        IdentifyingModKey = "SkyrimCurrencyReplacer.esp",
-                        TargetRelease = GameRelease.SkyrimSE,
-                        BlockAutomaticExit = true,
-                    }
-                });
+            return SynthesisPipeline.Instance
+                .AddPatch<ISkyrimMod, ISkyrimModGetter>(RunPatch)
+                .SetTypicalOpen(GameRelease.SkyrimSE, "SkyrimCurrencyReplacer.esp")
+                .Run(args);
         }
 
         private static void SynthesisLog(string message, bool special = false)
@@ -59,7 +47,7 @@ namespace SkyrimCurrencyReplacer
             return (new[] {"Skyrim", "Update", "Dawnguard", "HearthFires", "Dragonborn"}.Contains(modKey.Name));
         }
 
-        private static void RunPatch(SynthesisState<ISkyrimMod, ISkyrimModGetter> state)
+        private static void RunPatch(IPatcherState<ISkyrimMod, ISkyrimModGetter> state)
         {
             // 0. Initialize method contextual variables and configurations.
             ILinkCache cache = state.LinkCache;
@@ -91,27 +79,27 @@ namespace SkyrimCurrencyReplacer
             }
             
             // 1. Detect presence of Coins of Tamriel V2 Replacer plugin.
-            if (!state.LoadOrder.TryGetValue(CoinsOfTamrielModKey,
-                    out (int index, IModListing<ISkyrimModGetter> modListing) coinsOfTamrielContainer) ||
-                coinsOfTamrielContainer.modListing.Mod is null)
-                throw new MissingModException(CoinsOfTamrielModKey,
-                    $"Mod {CoinsOfTamrielModKey.Name} was not found in Load Order.");
+            if (!state.LoadOrder.TryGetValue(CoinsOfTamrielV2.ModKey, out var coinsOfTamrielContainer) ||
+                coinsOfTamrielContainer.Mod is null)
+                throw new MissingModException(CoinsOfTamrielV2.ModKey,
+                    $"Mod {CoinsOfTamrielV2.ModKey.Name} was not found in Load Order.");
+            var coinsIndex = state.LoadOrder.IndexOf(CoinsOfTamrielV2.ModKey);
 
             // 2. Patching ALL Containers for Currency Related information dynamically.
-            var coinsOfTamrielMod = coinsOfTamrielContainer.modListing.Mod;
+            var coinsOfTamrielMod = coinsOfTamrielContainer.Mod;
             var nativeContainers = coinsOfTamrielMod.Containers;
 
             // 2.a. Find Winning Containers we are allowed to clone, change and apply our algorithm to.
-            IEnumerable<ModContext<ISkyrimMod, IContainer, IContainerGetter>> containersToPatch = state.LoadOrder
+            var containersToPatch = state.LoadOrder
                 .PriorityOrder
                 .Container()
-                .WinningContextOverrides(cache)
+                .WinningContextOverrides()
                 .Where(context =>
                 {
                     // Detection Triggers ... 
                     return !nativeContainers.Contains(context.Record) &&
                         (context.Record.Items?.Any(container =>
-                        container.Item.Item.FormKey.IsOneOf(
+                        container.Item.Item.IsOneOf(
                             LootGoldChange,
                             LootPerkGoldenTouch,
                             LootPerkGoldenTouchChange,
@@ -122,7 +110,7 @@ namespace SkyrimCurrencyReplacer
                 });
             
             // TESTING SECTION //
-            containersToPatch.Do(ctx =>
+            containersToPatch.ForEach(ctx =>
                 SynthesisLog(
                     $"Container {ctx.Record.FormKey}: {ctx.Record.EditorID} - {ctx.Record.Name} from {ctx.ModKey.FileName} eligible."));
             return;
@@ -142,10 +130,10 @@ namespace SkyrimCurrencyReplacer
                 //state.LoadOrder.ListedOrder.Take(coinsOfTamrielContainer.index)
                 //  .Do(x => Console.WriteLine(x.ModKey));
 
-                var containerContext = state.LoadOrder.ListedOrder.Take(coinsOfTamrielContainer.index)
+                var containerContext = state.LoadOrder.ListedOrder.Take(coinsIndex)
                     .Reverse()
                     .Container()
-                    .WinningContextOverrides(state.LinkCache)
+                    .WinningContextOverrides()
                     .FirstOrDefault(recentContainer => container.FormKey == recentContainer.Record.FormKey);
 
                 if (containerContext is null) continue;
@@ -157,24 +145,23 @@ namespace SkyrimCurrencyReplacer
                 //SynthesisLog($"{cond1} {cond2} {cond3}");
 
                 if (!Equals(closestWinningContainer, container) &&
-                    !containerContext.ModKey.IsSkyrimBaseMod())
+                    !Implicits.Get(state.PatchMod.GameRelease).BaseMasters.Contains(containerContext.ModKey))
                 {
                     SynthesisLog("reached B");
                     var adjustedContainer = state.PatchMod.Containers.GetOrAddAsOverride(closestWinningContainer);
                     //var goldenTouchChange = state.LinkCache.Lookup<ILeveledItemGetter>(Skyrim.LeveledItem.LootPerkGoldenTouchChange);
                     var itemsToReplace = adjustedContainer.Items?.FindAll(i =>
-                        i.Item.Item.FormKey == LootPerkGoldenTouchChange);
+                        i.Item.Item.Equals(LootPerkGoldenTouchChange));
                     ContainerEntry goldenTouchChangeNordic = new ContainerEntry
                     {
                         Item = new ContainerItem()
                         {
                             Count = 1,
-                            Item = new FormLink<IItemGetter>(CoinsOfTamrielV2.LeveledItem
-                                .LootPerkGoldenTouchChangeNordic)
+                            Item = CoinsOfTamrielV2.LeveledItem.LootPerkGoldenTouchChangeNordic
                         }
                     };
 
-                    itemsToReplace?.Do(goldenTouchChange =>
+                    itemsToReplace?.ForEach(goldenTouchChange =>
                         adjustedContainer.Items.Replace<ContainerEntry>(goldenTouchChange, goldenTouchChangeNordic));
 
                     counter++;
